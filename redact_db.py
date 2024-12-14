@@ -1,11 +1,13 @@
 import sqlite3
 import os
-
 from tkinter import Tk, Frame, Button, Listbox, Scrollbar, Entry, Label, END, Toplevel, StringVar, OptionMenu, filedialog
+
+db_path = 'db/game_database.db'
 
 # --- Создание базы данных и таблиц ---
 def create_database():
-    conn = sqlite3.connect('../db/game_database.db')
+    print(db_path)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
 
@@ -80,7 +82,7 @@ def create_database():
 
 # --- Заполнение таблиц тестовыми данными ---
 def populate_tables():
-    conn = sqlite3.connect("../db/game_database.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     try:
@@ -114,7 +116,7 @@ def populate_tables():
 
 # --- Добавление записи в таблицу ---
 def add_record_to_table(table_name, values):
-    conn = sqlite3.connect("../db/game_database.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     cursor.execute(f"PRAGMA table_info({table_name})")
@@ -148,7 +150,7 @@ def open_add_record_window(selected_table):
     add_window = Toplevel()
     add_window.title(f"Добавление записи в {selected_table}")
 
-    conn = sqlite3.connect("../db/game_database.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute(f"PRAGMA table_info({selected_table})")
     fields = [column[1] for column in cursor.fetchall() if column[1] != "ID"]
@@ -166,7 +168,7 @@ def open_add_record_window(selected_table):
 
 # --- Просмотр данных таблиц ---
 def fetch_table_data(table_name):
-    conn = sqlite3.connect("../db/game_database.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute(f"SELECT * FROM {table_name}")
     rows = cursor.fetchall()
@@ -212,6 +214,8 @@ def create_interface():
 
     root.mainloop()
 
+    from core.engine import engine
+    engine.switch_to('Menu')
 
 # --- Основной код ---
 if __name__ == "__main__":
