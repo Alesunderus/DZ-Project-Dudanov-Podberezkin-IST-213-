@@ -1,7 +1,7 @@
 import pygame
 
 from core.camera import create_screen
-from core.input import keys_down
+from core.input import keys_down, keys_just_pressed
 
 pygame.init()
 
@@ -14,12 +14,15 @@ class Engine:
     def __init__(self, game_title):
         global engine
         engine = self
+        self.account = None
 
         self.active_objs = []
 
         self.background_drawables = []
         self.drawables = []
         self.ui_drawables = []
+
+        self.usables = []
 
         self.clear_color = (50, 150, 200)
         self.screen = create_screen(default_width, default_height, game_title)
@@ -40,12 +43,15 @@ class Engine:
         clock = pygame.time.Clock()
         self.running = True
         while self.running:
+            keys_just_pressed.clear()
             dt = clock.tick(60) / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
                 elif event.type == pygame.KEYDOWN:
                     keys_down.add(event.key)
+                    keys_just_pressed.append(event.key)
+                    keys_just_pressed.append(event.unicode)
                 elif event.type == pygame.KEYUP:
                     keys_down.remove(event.key)
 
@@ -62,6 +68,10 @@ class Engine:
             for u in self.ui_drawables:
                 u.draw(self.screen)
 
+            from core.effect import effects
+            for e in effects:
+                e.draw(self.screen)
+
             pygame.display.flip()
 
         pygame.quit()
@@ -73,3 +83,6 @@ class Engine:
         self.drawables.clear()
         self.ui_drawables.clear()
         self.background_drawables.clear()
+        self.usables.clear()
+        from core.effect import effects
+        effects.clear()

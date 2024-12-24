@@ -217,8 +217,23 @@ def create_interface():
     from core.engine import engine
     engine.switch_to('Menu')
 
+def find_account(typed_login):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM player_account WHERE login = '{typed_login}'")
+    row = cursor.fetchone()
+    conn.close()
+    return row
+
+def create_account(login, password, email):
+    data = (login, password, email, None)
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO player_account (login, password, email, progress_id) VALUES (?, ?, ?, ?)", data)
+    conn.commit()
+    cursor.close()
+
 # --- Основной код ---
 if __name__ == "__main__":
     create_database()
-    populate_tables()
     create_interface()

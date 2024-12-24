@@ -55,4 +55,4 @@ class Area:
                 self.entities.append(create_entity(id, x, y, items[3:]))
                 print(self.entities)
             except Exception as e:
-                sprint(f"Error parsing line: {line}. {e}")
+                print(f"Error parsing line: {line}. {e}")
