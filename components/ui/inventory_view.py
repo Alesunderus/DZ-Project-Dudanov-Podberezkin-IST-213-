@@ -29,6 +29,7 @@ class InventoryView:
 
         inventory.listener = self
         self.render()
+        engine.active_objs.append(self)
 
     def render(self):
         row = 0
@@ -62,3 +63,11 @@ class InventoryView:
     def refresh(self):
         self.clear()
         self.render()
+
+    def breakdown(self):
+        from core.engine import engine
+        engine.active_objs.remove(self)
+        self.clear()
+
+    def update(self, dt):
+        pass

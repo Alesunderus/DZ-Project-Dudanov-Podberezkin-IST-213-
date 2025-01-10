@@ -6,13 +6,16 @@ item_path = 'static/images'
 
 
 class ItemType:
-    def __init__(self, name, icon, stack_size = 1):
+    def __init__(self, name, icon, stack_size = 1, **kwargs):
         self.name = name
         self.icon_name = icon
         self.icon = pygame.image.load(item_path + '/' + icon)
         self.value = 0
         self.weight = 0
         self.stack_size = stack_size
+        self.stats = dict()
+        for key in kwargs:
+            self.stats[key] = kwargs[key]
 
 
 class ItemSlot:
@@ -25,6 +28,7 @@ class Inventory:
     def __init__(self, capacity):
         self.capacity = capacity
         self.taken_slots = 0
+        self.equipped_weapon = None
         self.slots = []
         for _ in range(self.capacity):
             self.slots.append(ItemSlot())
@@ -40,11 +44,9 @@ class Inventory:
             for slot in self.slots:
                 if slot.type == item_type:
                     add_amo = amount
-                    if add_amo > item_type.stack_size - slot.amount:
-                        add_amo = item_type.stack_size - slot.amount
                     slot.amount += add_amo
                     amount -= add_amo
-                    if amount <- 0:
+                    if amount <= 0:
                         self.notify()
                         return 0
         for slot in self.slots:

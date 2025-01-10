@@ -77,3 +77,8 @@ class InputText(Label):
         screen.blit(self.background, (self.entity.x, self.entity.y))
         screen.blit(self.shadow_surface, (self.entity.x+1, self.entity.y+1))
         screen.blit(self.surface, (self.entity.x, self.entity.y))
+
+    def breakdown(self):
+        from core.engine import engine
+        engine.ui_drawables.remove(self)
+        engine.active_objs.remove(self)

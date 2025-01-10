@@ -2,18 +2,27 @@ import pygame
 
 from components.sprite import Sprite
 from core.camera import camera
+from core.input import is_mouse_just_pressed
 from components.physics import Body, triggers
 from components.label import Label
 from components.entity import Entity
 from components.ui.inventory_view import InventoryView
 from components.inventory import Inventory
+from components.ui.bar import Bar
+from components.combat import Combat
 from core.math_ext import distance
+from gamedata.items_types import item_types
 
 inventory = Inventory(3)
 message_time_seconds = 3
 
+def on_player_death(entity):
+    from core.engine import engine
+    engine.switch_to('Menu')
+
 class Player:
-    def __init__(self):
+    def __init__(self, health):
+        self.health = health
         self.loc_label = Entity(Label('Montserrat-Medium.ttf',
                                         'X: 0 - Y: 0')).get(Label)
         self.message_label = Entity(Label('Montserrat-Medium.ttf', '')).get(Label)
@@ -26,10 +35,32 @@ class Player:
         self.message_label.entity.x = 10
         self.message_label.entity.y = 32
         self.message_countdown = 0
+        self.weapon = item_types[2]
 
     def show_message(self, message):
         self.message_label.set_text(message)
         self.message_countdown = message_time_seconds * 60
+
+    def setup(self):
+        inventory.add(item_types[0], 0)
+        inventory.add(item_types[4], 0)
+        combat = Combat(self.health, on_player_death)
+        self.entity.add(combat)
+        self.combat = combat
+        self.combat.equip(self.weapon)
+        del self.health
+
+        self.health_bar = Entity(Bar(self.combat.max_health, (255, 20, 20), (20, 255, 20))).get(Bar)
+        self.health_bar.entity.x = camera.width/2 - self.health_bar.width/2
+        self.health_bar.entity.y = camera.height - self.health_bar.height - 15
+
+    def breakdown(self):
+        self.loc_label.entity.delete_self()
+        self.message_label.entity.delete_self()
+        self.inventory_window.delete_self()
+        self.health_bar.entity.delete_self()
+        from core.engine import engine
+        engine.active_objs.remove(self)
 
     def interact(self, mouse_pos):
         from core.engine import engine
@@ -57,6 +88,7 @@ class Player:
         self.loc_label.set_text(f'X: {int(self.entity.x/32)} - Y: {int(self.entity.y/32)}')
         previous_x = self.entity.x
         previous_y = self.entity.y
+        self.health_bar.amount = self.combat.health
         sprite = self.entity.get(Sprite)
         body = self.entity.get(Body)
         sprite.image = pygame.transform.scale(sprite.image, (32, 32))
@@ -80,6 +112,16 @@ class Player:
         if(recent_keys[pygame.K_SPACE]):
             mouse_pos = pygame.mouse.get_pos()
             self.interact(mouse_pos)
+            if self.combat.equipped is not None:
+                self.combat.unequip()
+        if is_mouse_just_pressed(0):
+            if self.combat.equipped is None:
+                self.combat.equip(self.weapon)
+            self.combat.perform_attack()
         if (recent_keys[pygame.K_ESCAPE]):
+            from core.area import area
+            area.save_file()
+            from stages.play import quit_game
+            quit_game()
             from core.engine import engine
             engine.switch_to('Menu')

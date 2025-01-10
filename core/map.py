@@ -1,4 +1,5 @@
 from math import ceil
+import struct
 
 import pygame
 
@@ -12,26 +13,37 @@ tile_size = 32
 class TileKind:
     def __init__(self, name, image, is_solid):
         self.name = name
+        self.image_name = image
         self.image = pygame.image.load(image_folder_location + '/' + image)
         self.is_solid = is_solid
 
 
 class Map:
-    def __init__(self, data, tile_kinds):
+    def __init__(self, data, tile_kinds, legacy_data=False):
         from core.engine import engine
         engine.background_drawables.append(self)
         self.tile_kinds = tile_kinds
 
         # set up the tiles
-        self.tiles = []
-        for line in data.split('\n'):
-            row =[]
-            for tile_number in line:
-                row.append(int(tile_number))
-            self.tiles.append(row)
+        if legacy_data:
+            self.tiles = []
+            for line in data.split('\n'):
+                row =[]
+                for tile_number in line:
+                    row.append(int(tile_number))
+                self.tiles.append(row)
+        else:
+            self.tiles = data
+        print(len(self.tiles))
 
         # tiles size
         self.tile_size = tile_size
+
+    def save_to_file(self, file):
+        for y, row in enumerate(self.tiles):
+            for x, n in enumerate(row):
+                packed = struct.pack('H', n)
+                file.write(packed)
 
     def is_point_solid(self, x, y):
         x_tile = int(x/self.tile_size)
