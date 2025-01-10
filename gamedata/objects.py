@@ -6,6 +6,8 @@ from components.physics import Body
 from components.inventory import Inventory, DroppedItem
 from gamedata.items_types import item_types
 from components.usables import Minable, Chopable
+from components.tower import Tower
+from gamedata.buildings import tower_types
 
 class EntityFactory:
     def __init__(self, name, icon, factory, arg_names = [], defaults = []):
@@ -37,7 +39,11 @@ entity_factories = [
     # 4 makes an enemy
     EntityFactory('Enemy', 'enemies/skeleton.png',
                   lambda args: Entity(Sprite(args[0]), Enemy(100, 3), Body(8,24,12,12)),
-                  ['image'],['enemies/skeleton.png'])
+                  ['image'],['enemies/skeleton.png']),
+
+    # 5 makes a tower
+    EntityFactory('Tower', 'towers/archer.png',
+                  lambda args: Entity(Sprite(tower_types[int(args[0])].icon), Tower(tower_types[int(args[0])]), Body(0,0,32,32)),['TowerID'], ['0'])
 ]
 
 def create_entity(id, x, y, data=None):
