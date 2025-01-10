@@ -119,8 +119,6 @@ class Player:
                 self.combat.equip(self.weapon)
             self.combat.perform_attack()
         if (recent_keys[pygame.K_ESCAPE]):
-            from core.area import area
-            area.save_file()
             from stages.play import quit_game
             quit_game()
             from core.engine import engine

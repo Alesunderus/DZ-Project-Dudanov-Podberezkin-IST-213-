@@ -10,6 +10,8 @@ from components.player import Player
 def on_enemy_death(entity):
     from core.area import area
     area.remove_entity(entity)
+    from stages.play import decrease_enemy_count
+    decrease_enemy_count()
     print('Enemy died')
 
 class Enemy:
