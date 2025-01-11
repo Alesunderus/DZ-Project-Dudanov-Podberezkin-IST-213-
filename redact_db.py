@@ -256,13 +256,13 @@ def create_assign_progress(player_id):
     conn.commit()
     conn.close()
 
-def import_area_file(progress_id):
+def import_area_file(progress_id, wave_count):
     blob = convertToBinaryData('static/maps/load.map')
     print(blob)
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    query = "UPDATE player_progress SET area_file =? WHERE ID =?"
-    cursor.execute(query,(blob,progress_id))
+    query = "UPDATE player_progress SET area_file =?, current_wave =? WHERE ID =?"
+    cursor.execute(query,(blob,wave_count,progress_id))
     conn.commit()
     conn.close()
 

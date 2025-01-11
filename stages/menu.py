@@ -1,12 +1,12 @@
 import shutil
 
-
 from components.entity import Entity
 from components.button import Button
 from components.label import Label
 from components.sprite import Sprite
 from core.camera import camera
 from redact_db import find_progress, create_assign_progress, find_account
+from stages.play import set_wave_count
 
 def writeTofile(data, filename):
     # Convert binary data to proper format and write it on Hard Disk
@@ -60,6 +60,7 @@ def menu():
         if not engine.loaded_progress:
             if row[4] is not None:
                 writeTofile(row[4], 'static/maps/load.map')
+                set_wave_count(row[1])
                 engine.loaded_progress = True
             else:
                 shutil.copyfile('static/maps/start.map', 'static/maps/load.map')

@@ -86,7 +86,8 @@ class Area:
                 file.write(packed)
         file.close()
         from core.engine import engine
-        import_area_file(engine.account[4])
+        from stages.play import wave_count
+        import_area_file(engine.account[4], wave_count)
 
     def load_file(self, area_file):
         from core.engine import engine

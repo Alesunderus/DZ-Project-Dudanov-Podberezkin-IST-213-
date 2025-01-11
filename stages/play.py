@@ -27,10 +27,10 @@ def start_day():
     for e in area.entities:
         if e.has(Chopable):
             e.get(Chopable).regen()
-    from core.area import area
-    area.save_file()
     global wave_count
     wave_count += 1
+    from core.area import area
+    area.save_file()
 
 def quit_game():
     pygame.time.set_timer(night_event, 0)
@@ -75,3 +75,7 @@ def decrease_enemy_count():
     if left_enemies_amount <= 0:
         spawned_enemy_amount = 0
         start_day()
+
+def set_wave_count(count):
+    global wave_count
+    wave_count = count
