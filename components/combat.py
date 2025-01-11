@@ -48,8 +48,9 @@ class Combat:
         self.can_attack = False
         print(self.global_cooldown)
         create_hit_text(other.entity.x, other.entity.y, str(damage), (255, 20, 20))
+        from core.area import area
 
-        if other.health <= 0:
+        if other.health <= 0 and other.entity in area.entities:
             other.on_death(other.entity)
 
     def perform_attack(self):

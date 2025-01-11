@@ -1,7 +1,7 @@
 import pygame
 
 from core.camera import create_screen
-from core.input import keys_down, keys_just_pressed
+from core.input import keys_down, keys_just_pressed, add_scroll_delta, reset_scroll
 from stages.play import night_event, start_night, day_event, start_day
 
 pygame.init()
@@ -45,6 +45,7 @@ class Engine:
         clock = pygame.time.Clock()
         self.running = True
         while self.running:
+            reset_scroll()
             self.step += 1
             keys_just_pressed.clear()
             dt = clock.tick(60) / 1000
@@ -57,12 +58,14 @@ class Engine:
                     keys_just_pressed.append(event.unicode)
                 elif event.type == pygame.KEYUP:
                     keys_down.remove(event.key)
+                elif event.type == pygame.MOUSEWHEEL:
+                    add_scroll_delta(event.y)
+
                 if self.current_stage == 'Play':
                     if event.type == night_event:
                         start_night()
                     if event.type == day_event:
                         start_day()
-
 
             # Update code
             for a in self.active_objs:

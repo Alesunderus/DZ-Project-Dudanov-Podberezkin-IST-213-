@@ -33,6 +33,7 @@ class Area:
         e = create_entity(id, x, y, args)
         e.add(EntityPlaceholder(id, args))
         self.entities.append(e)
+        return e
 
     def remove_entity(self, e):
         print(e.get(EntityPlaceholder).id)

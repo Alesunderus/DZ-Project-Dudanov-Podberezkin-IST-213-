@@ -9,6 +9,7 @@ from components.entity import Entity
 from components.ui.inventory_view import InventoryView
 from components.inventory import Inventory
 from components.ui.bar import Bar
+from components.ui.scroll_view import ScrollView, create_scroll_sprite_generic, print_on_choose
 from components.combat import Combat
 from core.math_ext import distance
 from gamedata.items_types import item_types
@@ -17,6 +18,8 @@ inventory = Inventory(3)
 message_time_seconds = 3
 
 def on_player_death(entity):
+    from stages.play import quit_game
+    quit_game()
     from core.engine import engine
     engine.switch_to('Menu')
 
@@ -53,6 +56,11 @@ class Player:
         self.health_bar = Entity(Bar(self.combat.max_health, (255, 20, 20), (20, 255, 20))).get(Bar)
         self.health_bar.entity.x = camera.width/2 - self.health_bar.width/2
         self.health_bar.entity.y = camera.height - self.health_bar.height - 15
+        from gamedata.buildings import tower_types
+        self.buildings_scroll_view = Entity(ScrollView(tower_types, create_scroll_sprite_generic, print_on_choose,
+                                                       48, 150, 100)).get(ScrollView)
+        self.buildings_scroll_view.entity.x = 15
+        self.buildings_scroll_view.entity.y = camera.height - self.buildings_scroll_view.height - 15
 
     def breakdown(self):
         self.loc_label.entity.delete_self()
@@ -115,9 +123,22 @@ class Player:
             if self.combat.equipped is not None:
                 self.combat.unequip()
         if is_mouse_just_pressed(0):
-            if self.combat.equipped is None:
-                self.combat.equip(self.weapon)
-            self.combat.perform_attack()
+            if self.buildings_scroll_view.selected_item is None:
+                if self.combat.equipped is None:
+                    self.combat.equip(self.weapon)
+                self.combat.perform_attack()
+            else:
+                mouse_pos = pygame.mouse.get_pos()
+                can_be_placed = True
+                from core.area import area
+                if can_be_placed:
+                    building = area.add_entity(5, (int(mouse_pos[0]+camera.x)/32), (int(mouse_pos[1]+camera.y)/32), [str(self.buildings_scroll_view.selected_item)])
+                    if building.get(Body).is_position_valid():
+                        self.show_message('Tower placed')
+                    else:
+                        building.delete_self()
+                        self.show_message('Wrong position')
+
         if (recent_keys[pygame.K_ESCAPE]):
             from stages.play import quit_game
             quit_game()

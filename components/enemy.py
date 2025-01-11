@@ -14,10 +14,19 @@ def on_enemy_death(entity):
     decrease_enemy_count()
     print('Enemy died')
 
-class Enemy:
-    def __init__(self, health, weapon_item_id) -> None:
+
+class EnemyType:
+    def __init__(self, health, weapon_item_id, first_wave, spawn_cost):
         self.health = health
         self.weapon = item_types[weapon_item_id]
+        self.first_wave = first_wave
+        self.spawn_cost = spawn_cost
+
+
+class Enemy:
+    def __init__(self, enemy_type) -> None:
+        self.health = enemy_type.health
+        self.weapon = enemy_type.weapon
 
         self.target = None
         self.targeted_entity = None
@@ -63,18 +72,19 @@ class Enemy:
                 self.combat.attack(self.targeted_entity.get(Combat))
 
         if self.target is not None:
-            body = self.entity.get(Body)
-            prev_x = self.entity.x
-            prev_y = self.entity.y
-            if self.entity.x < self.target[0]:
-                self.entity.x += self.walk_speed
-            if self.entity.x > self.target[0]:
-                self.entity.x -= self.walk_speed
-            if not body.is_position_valid():
-                self.entity.x = prev_x
-            if self.entity.y < self.target[1]:
-                self.entity.y += self.walk_speed
-            if self.entity.y > self.target[1]:
-                self.entity.y -= self.walk_speed
-            if not body.is_position_valid():
-                self.entity.y = prev_y
+            if self.entity.has(Body):
+                body = self.entity.get(Body)
+                prev_x = self.entity.x
+                prev_y = self.entity.y
+                if self.entity.x < self.target[0]:
+                    self.entity.x += self.walk_speed
+                if self.entity.x > self.target[0]:
+                    self.entity.x -= self.walk_speed
+                if not body.is_position_valid():
+                    self.entity.x = prev_x
+                if self.entity.y < self.target[1]:
+                    self.entity.y += self.walk_speed
+                if self.entity.y > self.target[1]:
+                    self.entity.y -= self.walk_speed
+                if not body.is_position_valid():
+                    self.entity.y = prev_y
