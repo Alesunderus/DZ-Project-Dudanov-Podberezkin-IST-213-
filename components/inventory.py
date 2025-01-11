@@ -68,12 +68,10 @@ class Inventory:
                 if slot.amount < amount:
                     found += slot.amount
                     slot.amount = 0
-                    slot.type = None
                     continue
                 elif slot.amount == amount:
                     found += amount
                     slot.amount = 0
-                    slot.type = None
                     self.notify()
                     return found
                 else:

@@ -129,15 +129,23 @@ class Player:
                 self.combat.perform_attack()
             else:
                 mouse_pos = pygame.mouse.get_pos()
-                can_be_placed = True
+                from gamedata.buildings import tower_types
+                can_be_placed = False
+                if inventory.has(item_types[0], tower_types[self.buildings_scroll_view.selected_item].price[0]) and \
+                        inventory.has(item_types[4], tower_types[self.buildings_scroll_view.selected_item].price[1]):
+                    can_be_placed = True
                 from core.area import area
                 if can_be_placed:
                     building = area.add_entity(5, (int(mouse_pos[0]+camera.x)/32), (int(mouse_pos[1]+camera.y)/32), [str(self.buildings_scroll_view.selected_item)])
                     if building.get(Body).is_position_valid():
                         self.show_message('Tower placed')
+                        inventory.remove(item_types[0], tower_types[self.buildings_scroll_view.selected_item].price[0])
+                        inventory.remove(item_types[4], tower_types[self.buildings_scroll_view.selected_item].price[1])
                     else:
                         building.delete_self()
                         self.show_message('Wrong position')
+                else:
+                    self.show_message('Not enough resources')
 
         if (recent_keys[pygame.K_ESCAPE]):
             from stages.play import quit_game

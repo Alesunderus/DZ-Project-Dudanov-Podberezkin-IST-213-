@@ -8,7 +8,9 @@ from components.combat import Combat
 
 
 class TowerType():
-    def __init__(self, name, icon, projectile_sprite, damage, attack_speed, range, health):
+    def __init__(self, name, icon, projectile_sprite, damage, attack_speed, range, health, price=None):
+        if price is None:
+            price = [0, 0, 0]
         self.name = name
         self.icon = icon
         self.projectile_sprite = projectile_sprite
@@ -16,6 +18,7 @@ class TowerType():
         self.attack_speed = attack_speed
         self.range = range
         self.health = health
+        self.price = price
 
 
 class Tower():
