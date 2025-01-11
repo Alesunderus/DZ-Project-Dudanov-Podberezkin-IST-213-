@@ -1,8 +1,18 @@
+import shutil
+
+
 from components.entity import Entity
 from components.button import Button
 from components.label import Label
 from components.sprite import Sprite
 from core.camera import camera
+from redact_db import find_progress, create_assign_progress, find_account
+
+def writeTofile(data, filename):
+    # Convert binary data to proper format and write it on Hard Disk
+    with open(filename, 'wb') as file:
+        file.write(data)
+    print("Stored blob data into: ", filename, "\n")
 
 def new_game():
     from core.engine import engine
@@ -42,3 +52,23 @@ def menu():
     new_game_btn.add(Button(new_game, new_btn_size))
     db_btn.add(Button(edit_db, db_btn_size))
     quit_game_btn.add(Button(quit_game, quit_btn_size))
+
+    from core.engine import engine
+    print(engine.account)
+    if engine.account[4] is not None:
+        row = find_progress(engine.account[4])
+        if not engine.loaded_progress:
+            if row[4] is not None:
+                writeTofile(row[4], 'static/maps/load.map')
+                engine.loaded_progress = True
+            else:
+                shutil.copyfile('static/maps/start.map', 'static/maps/load.map')
+                engine.loaded_progress = True
+
+
+    else:
+        create_assign_progress(engine.account[0])
+        engine.account = find_account(engine.account[1])
+        print(engine.account)
+        shutil.copyfile('static/maps/start.map', 'static/maps/load.map')
+        engine.loaded_progress = True

@@ -17,7 +17,7 @@ class Engine:
         global engine
         engine = self
         self.account = None
-
+        self.loaded_progress = False
         self.active_objs = []
 
         self.background_drawables = []

@@ -4,6 +4,12 @@ from tkinter import Tk, Frame, Button, Listbox, Scrollbar, Entry, Label, END, To
 
 db_path = 'db/game_database.db'
 
+def convertToBinaryData(filename):
+    # Convert digital data to binary format
+    with open(filename, 'rb') as file:
+        blob_data = file.read()
+    return blob_data
+
 # --- Создание базы данных и таблиц ---
 def create_database():
     print(db_path)
@@ -31,7 +37,7 @@ def create_database():
         current_wave INTEGER,
         tech_matrix TEXT,
         characteristics TEXT,
-        buildings_coordinates TEXT
+        area_file BLOB
     )
     """)
 
@@ -232,6 +238,33 @@ def create_account(login, password, email):
     cursor.execute("INSERT OR IGNORE INTO player_account (login, password, email, progress_id) VALUES (?, ?, ?, ?)", data)
     conn.commit()
     cursor.close()
+
+def find_progress(progress_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM player_progress WHERE ID = '{progress_id}'")
+    row = cursor.fetchone()
+    conn.close()
+    return row
+
+def create_assign_progress(player_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO player_progress (current_wave, tech_matrix, characteristics, area_file) VALUES (?, ?, ?, ?)", (1,None,None,None))
+    progress_id = cursor.lastrowid
+    cursor.execute(f"UPDATE player_account SET progress_id = '{progress_id}' WHERE ID = '{player_id}'")
+    conn.commit()
+    conn.close()
+
+def import_area_file(progress_id):
+    blob = convertToBinaryData('static/maps/load.map')
+    print(blob)
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    query = "UPDATE player_progress SET area_file =? WHERE ID =?"
+    cursor.execute(query,(blob,progress_id))
+    conn.commit()
+    conn.close()
 
 # --- Основной код ---
 if __name__ == "__main__":

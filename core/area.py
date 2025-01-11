@@ -6,6 +6,7 @@ import traceback
 from core.map import Map
 from gamedata.objects import create_entity
 from components.editor import EntityPlaceholder
+from redact_db import import_area_file
 
 area = None
 area_folder_location = 'static/maps'
@@ -84,7 +85,8 @@ class Area:
                 packed = struct.pack('c', bytes('\0', 'utf-8'))
                 file.write(packed)
         file.close()
-
+        from core.engine import engine
+        import_area_file(engine.account[4])
 
     def load_file(self, area_file):
         from core.engine import engine
