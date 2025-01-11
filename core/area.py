@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import struct
@@ -7,6 +8,7 @@ from core.map import Map
 from gamedata.objects import create_entity
 from components.editor import EntityPlaceholder
 from redact_db import import_area_file
+from gamedata.items_types import item_types
 
 area = None
 area_folder_location = 'static/maps'
@@ -87,7 +89,14 @@ class Area:
         file.close()
         from core.engine import engine
         from stages.play import wave_count
-        import_area_file(engine.account[4], wave_count)
+        from components.player import inventory
+        wood_id = inventory.get_index(item_types[0])
+        stone_id = inventory.get_index(item_types[4])
+        wood_amount = inventory.slots[wood_id].amount
+        stone_amount = inventory.slots[stone_id].amount
+        save_inventory = {'Wood': wood_amount, 'Stone': stone_amount}
+        inventory_json = json.dumps(save_inventory)
+        import_area_file(engine.account[4], wave_count, inventory_json)
 
     def load_file(self, area_file):
         from core.engine import engine

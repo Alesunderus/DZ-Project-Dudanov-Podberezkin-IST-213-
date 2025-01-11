@@ -1,3 +1,4 @@
+import json
 import shutil
 
 from components.entity import Entity
@@ -7,6 +8,7 @@ from components.sprite import Sprite
 from core.camera import camera
 from redact_db import find_progress, create_assign_progress, find_account
 from stages.play import set_wave_count
+from gamedata.items_types import item_types
 
 def writeTofile(data, filename):
     # Convert binary data to proper format and write it on Hard Disk
@@ -65,8 +67,11 @@ def menu():
             else:
                 shutil.copyfile('static/maps/start.map', 'static/maps/load.map')
                 engine.loaded_progress = True
-
-
+            if row[3] is not None:
+                inventory_data = json.loads(row[3])
+                from components.player import inventory
+                inventory.add(item_types[0], inventory_data['Wood'])
+                inventory.add(item_types[4], inventory_data['Stone'])
     else:
         create_assign_progress(engine.account[0])
         engine.account = find_account(engine.account[1])
