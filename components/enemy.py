@@ -16,11 +16,13 @@ def on_enemy_death(entity):
 
 
 class EnemyType:
-    def __init__(self, health, weapon_item_id, first_wave, spawn_cost):
+    def __init__(self, health, speed,weapon_item_id, first_wave, spawn_cost, sprite):
         self.health = health
         self.weapon = item_types[weapon_item_id]
         self.first_wave = first_wave
         self.spawn_cost = spawn_cost
+        self.sprite = sprite
+        self.speed = speed
 
 
 class Enemy:
@@ -32,7 +34,8 @@ class Enemy:
         self.targeted_entity = None
         self.stop_to_update = random.randint(0,30)
         self.vision_range = 500
-        self.walk_speed = 0.5
+        self.walk_speed = enemy_type.speed
+        self.sprite = enemy_type.sprite
 
         from core.engine import engine
         engine.active_objs.append(self)
@@ -44,6 +47,7 @@ class Enemy:
         self.combat = self.entity.get(Combat)
         self.combat.equip(self.weapon)
         del self.health
+        self.entity.get(Sprite).set_image(self.sprite)
 
     def breakdown(self):
         from core.engine import engine

@@ -6,9 +6,10 @@ from components.button import Button
 from components.label import Label
 from components.sprite import Sprite
 from core.camera import camera
-from redact_db import find_progress, create_assign_progress, find_account
+from redact_db import find_progress, create_assign_progress, find_account, get_enemies
 from stages.play import set_wave_count
 from gamedata.items_types import item_types
+from gamedata.enemy_types import initialize_enemy_types
 
 def writeTofile(data, filename):
     # Convert binary data to proper format and write it on Hard Disk
@@ -57,9 +58,9 @@ def menu():
 
     from core.engine import engine
     print(engine.account)
-    if engine.account[4] is not None:
-        row = find_progress(engine.account[4])
-        if not engine.loaded_progress:
+    if not engine.loaded_progress:
+        if engine.account[4] is not None:
+            row = find_progress(engine.account[4])
             if row[4] is not None:
                 writeTofile(row[4], 'static/maps/load.map')
                 set_wave_count(row[1])
@@ -72,9 +73,10 @@ def menu():
                 from components.player import inventory
                 inventory.add(item_types[0], inventory_data['Wood'])
                 inventory.add(item_types[4], inventory_data['Stone'])
-    else:
-        create_assign_progress(engine.account[0])
-        engine.account = find_account(engine.account[1])
-        print(engine.account)
-        shutil.copyfile('static/maps/start.map', 'static/maps/load.map')
-        engine.loaded_progress = True
+        else:
+            create_assign_progress(engine.account[0])
+            engine.account = find_account(engine.account[1])
+            print(engine.account)
+            shutil.copyfile('static/maps/start.map', 'static/maps/load.map')
+            engine.loaded_progress = True
+        initialize_enemy_types(get_enemies())

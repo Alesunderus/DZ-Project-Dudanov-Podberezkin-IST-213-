@@ -46,12 +46,12 @@ def create_database():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS enemies (
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        sprite TEXT NOT NULL,
         health INTEGER NOT NULL,
         speed REAL NOT NULL,
-        damage INTEGER NOT NULL,
+        weapon_id INTEGER NOT NULL,
         first_wave INTEGER NOT NULL,
-        spawn_cost INTEGER NOT NULL
+        spawn_cost INTEGER NOT NULL,
+        sprite BLOB NOT NULL
     )
     """)
 
@@ -266,7 +266,25 @@ def import_area_file(progress_id, wave_count, inventory_save):
     conn.commit()
     conn.close()
 
+def get_enemies():
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM enemies")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+def import_enemy(health, speed, weapon_id, first_wave, spawn_cost, sprite_link):
+    sprite_blob = convertToBinaryData(sprite_link)
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    query = "INSERT OR IGNORE INTO enemies (health, speed, weapon_id, first_wave, spawn_cost, sprite) VALUES (?, ?, ?, ?, ?, ?)"
+    cursor.execute(query, (health, speed, weapon_id, first_wave, spawn_cost, sprite_blob))
+    conn.commit()
+    conn.close()
+
 # --- Основной код ---
 if __name__ == "__main__":
     create_database()
     create_interface()
+    #import_enemy(200,1,2,3,2, 'static/images/enemies/skeleton.png')
