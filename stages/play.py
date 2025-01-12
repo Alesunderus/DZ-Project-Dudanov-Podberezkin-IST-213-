@@ -4,7 +4,8 @@ import pygame
 
 from core.area import Area
 from gamedata.tiletypes import tile_kinds
-from components.usables import Chopable
+from components.usables import Chopable, Minable
+from components.physics import Body
 from gamedata.enemy_types import enemy_types
 
 night_event = pygame.event.custom_type()
@@ -27,6 +28,22 @@ def start_day():
     for e in area.entities:
         if e.has(Chopable):
             e.get(Chopable).regen()
+    rocks_left = 0
+    for e in area.entities:
+        if e.has(Minable):
+            rocks_left+=1
+    rocks_to_spawn = 5 - rocks_left
+    print(f'Rocks to spawn {rocks_to_spawn}')
+    if rocks_to_spawn > 0:
+        for i in range(rocks_to_spawn):
+            print(f'Rocks to spawn {i}')
+            placement_valid = False
+            while not placement_valid:
+                new_rock = area.add_entity(2, random.randint(0,35), random.randint(15, 28), [])
+                print(f'Rock entity {new_rock}')
+                placement_valid = new_rock.get(Body).is_position_valid()
+                if not placement_valid:
+                    new_rock.delete_self()
     global wave_count
     wave_count += 1
     from core.area import area
