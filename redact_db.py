@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import json
 from tkinter import Tk, Frame, Button, Listbox, Scrollbar, Entry, Label, END, Toplevel, StringVar, OptionMenu, filedialog
 
 db_path = 'db/game_database.db'
@@ -72,13 +73,14 @@ def create_database():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS buildings (
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        sprite_inactive TEXT NOT NULL,
-        sprite_active TEXT NOT NULL,
-        projectile_sprite TEXT NOT NULL,
-        damage_type TEXT NOT NULL,
+        name TEXT NOT NULL,
+        sprite_active BLOB NOT NULL,
+        projectile_sprite BLOB NOT NULL,
         damage INTEGER NOT NULL,
+        attack_speed REAL NOT NULL,
+        range INTEGER NOT NULL,
         health INTEGER NOT NULL,
-        resource_cost INTEGER NOT NULL
+        resource_cost TEXT NOT NULL
     )
     """)
 
@@ -274,6 +276,14 @@ def get_enemies():
     conn.close()
     return rows
 
+def get_buildings():
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM buildings")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
 def import_enemy(health, speed, weapon_id, first_wave, spawn_cost, sprite_link):
     sprite_blob = convertToBinaryData(sprite_link)
     conn = sqlite3.connect(db_path)
@@ -283,8 +293,23 @@ def import_enemy(health, speed, weapon_id, first_wave, spawn_cost, sprite_link):
     conn.commit()
     conn.close()
 
+def import_building(name, sprite, projective_sprite, damage, attack_speed, range, health, price):
+    sprite_blob = convertToBinaryData(sprite)
+    projectile_blob = convertToBinaryData(projective_sprite)
+    price_data = {'Wood': price[0], 'Stone': price[1]}
+    price_json = json.dumps(price_data)
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    query = "INSERT OR IGNORE INTO buildings (name, sprite_active, projectile_sprite, damage, attack_speed, range, health, resource_cost) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+    cursor.execute(query, (name, sprite_blob, projectile_blob, damage, attack_speed, range, health, price_json))
+    conn.commit()
+    conn.close()
+
 # --- Основной код ---
 if __name__ == "__main__":
     create_database()
     create_interface()
-    #import_enemy(200,1,2,3,2, 'static/images/enemies/skeleton.png')
+    # import_enemy(100,0.5,3,1,1, 'static/images/enemies/skeleton.png')
+    # import_enemy(200,1,2,3,2, 'static/images/enemies/skeleton.png')
+    # import_building('Archer', 'static/images/towers/archer.png', 'static/images/towers/archer.png', 20, 2,200, 100, [100,50,0])
+    # import_building('Mage', 'static/images/towers/mage.png', 'static/images/towers/mage.png', 50, 3,450, 200, [500,300,0])

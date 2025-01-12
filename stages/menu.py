@@ -6,10 +6,11 @@ from components.button import Button
 from components.label import Label
 from components.sprite import Sprite
 from core.camera import camera
-from redact_db import find_progress, create_assign_progress, find_account, get_enemies
+from redact_db import find_progress, create_assign_progress, find_account, get_enemies, get_buildings
 from stages.play import set_wave_count
 from gamedata.items_types import item_types
 from gamedata.enemy_types import initialize_enemy_types
+from gamedata.buildings import initialize_tower_types
 
 def writeTofile(data, filename):
     # Convert binary data to proper format and write it on Hard Disk
@@ -80,3 +81,4 @@ def menu():
             shutil.copyfile('static/maps/start.map', 'static/maps/load.map')
             engine.loaded_progress = True
         initialize_enemy_types(get_enemies())
+        initialize_tower_types(get_buildings())
