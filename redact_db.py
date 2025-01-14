@@ -147,7 +147,12 @@ def open_add_record_window(selected_table):
             if file_path:
                 blob = convertToBinaryData(file_path)
                 values[5] = blob  # Сохраняем путь в базе
-
+        elif selected_table in ("buildings"):
+            file_path = filedialog.askopenfilename(title="Выберите файл изображения")
+            if file_path:
+                blob = convertToBinaryData(file_path)
+                values[1] = blob
+                values[2] = blob
         add_record_to_table(selected_table, values)
         add_window.destroy()
 
