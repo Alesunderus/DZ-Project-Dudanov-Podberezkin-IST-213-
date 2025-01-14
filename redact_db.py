@@ -130,8 +130,8 @@ def add_record_to_table(table_name, values):
     cursor.execute(f"PRAGMA table_info({table_name})")
     fields = [column[1] for column in cursor.fetchall() if column[1] != "ID"]
     placeholders = ", ".join(["?"] * len(fields))
-
-    cursor.execute(f"INSERT INTO {table_name} ({', '.join(fields)}) VALUES ({placeholders})", values)
+    command_line = f"INSERT INTO {table_name} ({', '.join(fields)}) VALUES ({placeholders})"
+    cursor.execute(command_line, values)
     conn.commit()
     conn.close()
 
@@ -142,15 +142,11 @@ def open_add_record_window(selected_table):
         values = [entry.get() for entry in entries]
 
         # Если это таблица с изображениями, обрабатываем путь спрайта
-        if selected_table in ("enemies", "technologies", "buildings"):
+        if selected_table in ("enemies"):
             file_path = filedialog.askopenfilename(title="Выберите файл изображения")
             if file_path:
-                sprite_name = os.path.basename(file_path)
-                dest_dir = os.path.join(os.getcwd(), "sprites")
-                os.makedirs(dest_dir, exist_ok=True)
-                dest_path = os.path.join(dest_dir, sprite_name)
-                os.rename(file_path, dest_path)
-                values[0] = dest_path  # Сохраняем путь в базе
+                blob = convertToBinaryData(file_path)
+                values[5] = blob  # Сохраняем путь в базе
 
         add_record_to_table(selected_table, values)
         add_window.destroy()
@@ -189,7 +185,6 @@ def update_listbox(table_name, listbox):
     rows = fetch_table_data(table_name)
     for row in rows:
         listbox.insert(END, row)
-
 
 # --- Основной интерфейс ---
 def create_interface():
@@ -305,11 +300,20 @@ def import_building(name, sprite, projective_sprite, damage, attack_speed, range
     conn.commit()
     conn.close()
 
+def game_over(player_id, progress_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute(f"DELETE FROM player_progress WHERE ID = '{progress_id}'")
+    cursor.execute(f"UPDATE player_account SET progress_id = NULL WHERE ID = '{player_id}' ")
+    conn.commit()
+    conn.close()
+
 # --- Основной код ---
 if __name__ == "__main__":
     create_database()
     create_interface()
     # import_enemy(100,0.5,3,1,1, 'static/images/enemies/skeleton.png')
     # import_enemy(200,1,2,3,2, 'static/images/enemies/skeleton.png')
+    #import_enemy(250,1,5,5,3, 'static/images/enemies/demon.png')
     # import_building('Archer', 'static/images/towers/archer.png', 'static/images/towers/archer.png', 20, 2,200, 100, [100,50,0])
     # import_building('Mage', 'static/images/towers/mage.png', 'static/images/towers/mage.png', 50, 3,450, 200, [500,300,0])

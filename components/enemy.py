@@ -33,7 +33,7 @@ class Enemy:
         self.target = None
         self.targeted_entity = None
         self.stop_to_update = random.randint(0,30)
-        self.vision_range = 500
+        self.vision_range = 2000
         self.walk_speed = enemy_type.speed
         self.sprite = enemy_type.sprite
 

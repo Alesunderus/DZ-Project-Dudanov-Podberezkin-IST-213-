@@ -61,6 +61,10 @@ class Inventory:
                     self.notify()
                     return 0
 
+    def reset_resources(self):
+        for slot in self.slots:
+            slot.amount = 0
+
     def remove(self, item_type, amount = 1):
         found = 0
         for slot in self.slots:

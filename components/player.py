@@ -13,6 +13,7 @@ from components.ui.scroll_view import ScrollView, create_scroll_sprite_generic, 
 from components.combat import Combat
 from core.math_ext import distance
 from gamedata.items_types import item_types
+from redact_db import game_over, find_account
 
 inventory = Inventory(3)
 message_time_seconds = 3
@@ -21,6 +22,10 @@ def on_player_death(entity):
     from stages.play import quit_game
     quit_game()
     from core.engine import engine
+    inventory.reset_resources()
+    game_over(engine.account[0], engine.progress[0])
+    engine.account = find_account(engine.account[1])
+    engine.loaded_progress = False
     engine.switch_to('Menu')
 
 class Player:

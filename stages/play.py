@@ -68,6 +68,13 @@ def start_night():
         if enemy.first_wave <= wave_count:
             enemies_can_spawn.append(i)
     print(len(enemies_can_spawn))
+    spawn_side = random.randint(1, 2)
+    if spawn_side == 1:
+        x = 1
+        y = random.randint(1, 28)
+    else:
+        x = random.randint(1, 36)
+        y = 27
     while wave_points > 0:
         enemy_cost = 10000
         random_enemy = 0
@@ -78,7 +85,13 @@ def start_night():
                 random_enemy = 0
             enemy_cost = enemy_types[enemies_can_spawn[random_enemy]].spawn_cost
         from core.area import area
-        area.add_entity(4, spawned_enemy_amount+2, 1, ['enemies/skeleton.png',str(random_enemy)])
+        placement_valid = False
+        while not placement_valid:
+            new_enemy = area.add_entity(4, x, y, ['enemies/skeleton.png',str(random_enemy)])
+            placement_valid = new_enemy.get(Body).is_position_valid()
+            if not placement_valid:
+                new_enemy.delete_self()
+                x,y = rand_enemy_coords(x,y)
         wave_points -= enemy_cost
         spawned_enemy_amount +=1
         print('b')
@@ -96,3 +109,12 @@ def decrease_enemy_count():
 def set_wave_count(count):
     global wave_count
     wave_count = count
+
+def rand_enemy_coords(x, y):
+    if x == 1:
+        new_x = 1
+        new_y = random.randint(1,28)
+    elif  y == 27:
+        new_x = random.randint(1, 36)
+        new_y = 27
+    return new_x, new_y

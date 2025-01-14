@@ -80,5 +80,6 @@ def menu():
             print(engine.account)
             shutil.copyfile('static/maps/start.map', 'static/maps/load.map')
             engine.loaded_progress = True
+        engine.progress = find_progress(engine.account[4])
         initialize_enemy_types(get_enemies())
         initialize_tower_types(get_buildings())
